@@ -1,295 +1,300 @@
-'use strict';
-const scrollButton = document.querySelector('.btn--scroll-to');
-const sectionScroll = document.querySelector('.features__header');
-const featuresSection = document.querySelector('.features');
-const div = document.querySelector('H1');
+'use strict'
 
-const tabs = document.querySelectorAll('.operations__tab');
-const container = document.querySelector('.operations__tab-container');
-const pageContents = document.querySelectorAll('.operations__content');
+/////////////////
+// DOM for app
+/////////////////
 
+const form=document.querySelector('.form'
+)
+const inputType=document.querySelector('.form__input')
+const cadence=document.querySelector('.form__input--cadence')
+const elevGain=document.querySelector('.form__input--elevation')
+const inputDistance=document.querySelector('.form__input--distance')
+const inputDuration=document.querySelector('.form__input--duration')
+const workoutContainer=document.querySelector('.workouts')
+
+// App variable initiation
+let coords
+let v_distance
+let v_duration
+let v_type
+let workouts
+let zoomLevel=13
+
+/////////////////////////////////////////
+// Class creation for running and cycling workouts
 ///////////////////////////////////////
-// Modal window
-////////////////////////////////////////
+///////////////////////////
+// Parent class
+///////////////////////////
+class workout{
+  id=(Date.now()+'').slice(5)
+  
+      constructor(distance,duration){
+    this.coords=coords
+    this.distance=distance
+    this.duration=duration
+    this._setDescription
+    }
+}
 
-const modal = document.querySelector('.modal');
-const overlay = document.querySelector('.overlay');
-const btnCloseModal = document.querySelector('.btn--close-modal');
-const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
-const header = document.querySelector('.highlight');
+//////////////////////////////
+// children classes
+class running extends workout{
+constructor(coords,v_type,distance,duration,cadence){
 
+super(distance,duration,coords)
+this.type=v_type
+this.coords=coords
+this.distance=distance
+this.duration=duration
 
-// Opens the modal window
-const openModal = function () {
-  modal.classList.remove('hidden');
-  overlay.classList.remove('hidden');
-};
+this.inputCadence
+this.calcPace()
+}
+calcPace(){
+ this.pace=this.duration/this.distance
 
-// Closes the modal window
-const closeModal = function () {
-  modal.classList.add('hidden');
-  overlay.classList.add('hidden');
-};
+ return this.pace
+}
+}
 
-for (let i = 0; i < btnsOpenModal.length; i++)
-  btnsOpenModal[i].addEventListener('click', openModal);
+class cycling extends workout{
+    constructor(coords,v_type,distance,duration,inputElevGain){
+    super(distance,duration,coords)
+  
+    this.type=v_type
+    this.coords=coords
+    this.distance=distance
+    this.duration=duration
+    this.inputElevGain
+    this.calcSpeed()
+    }
 
-btnCloseModal.addEventListener('click', closeModal);
-overlay.addEventListener('click', closeModal);
+    //////////////////////////////
+    // calculate cycle speed
+    /////////////////////////////
+    calcSpeed(){
+     this.speed=this.distance/(this.duration/60)
+     return this.speed
+}
+}
 
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-    closeModal();
-  }
-});
-header.color = 'rgb(255, 255, 255)';
-
-
-//The 'learn more' click event that takes you to the banks features
-scrollButton.addEventListener('click', function () {
- 
- 
-  featuresSection.scrollIntoView({
-  behavior: 'smooth'})
-  });
-
-// Scrolling from the top navigation buttons
-document.querySelector('.nav__links').addEventListener('click',function(e)
-{
-
+////////////////////////////
+// class creation for various variables for the form and map clicking
+////////////////////////////
+class parentApp{
+  constructor()
   {
-  e.preventDefault()
-
-   if(e.target.classList.contains('nav__link')){
-    
-    if(e.target.classList.contains('nav__link--btn')){return}
-
-    const link=e.target.getAttribute('href')
-    
-   document.querySelector(link).scrollIntoView({behavior:'smooth'})
-   
+    this._setDescription()
   }
+  _setDescription(){
+    let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    this._description=months[new Date().getMonth()]
+    return (this._description)
   }
 }
+class app extends parentApp{
+
+  #onClickCoords//mouse object which shows the coordinates inside
+  #onClickCoordinates//the click used to  generate a position on the map
+    #mapping
+    sckCoords
+    #allWorkouts=[]
+  
+
+    constructor(){
+      super(parentApp._setDescription)
+        this.findLocation()
+        form.addEventListener('submit',this._genMarker.bind(this))
+        inputType.addEventListener('change',this.menuToggle)
+      
+        document.querySelector('.sidebar').addEventListener('click',this.theClick.bind(this))
+        this._setDescription()
+        
+    }
+
+    findLocation(){
+        navigator.geolocation.getCurrentPosition
+        
+        (this._findCurrPosition.bind(this),
+        //////////////////////////////////////
+        // Error in case of connection loss
+        /////////////////////////////////////////
+function(){
+    console.log("Can't get position")
+}
+)}
+//////////////////////////////
+//  Functions start here////
+/////////////////////////////
+///////////////////////////
+// Get current location//
+///////////////////////////
+
+_findCurrPosition(currPosition){
+    const {latitude,longitude}=currPosition.coords
+    
+    let coords=[latitude,longitude]
+
+    this.#mapping=L.map('map').setView(coords, zoomLevel)
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(this.#mapping);
+
+this.#mapping.on('click',this._genForm.bind(this))
+}
+
+/////////////////////////
+// Generate marker and form completion
+/////////////////////  
+
+    _genMarker(e){
+      
+  const arr=(...inputs)=>inputs.every(inp=>inp>0)
+    e.preventDefault() 
+    
+      if (!arr(+inputDistance.value,+inputDuration.value)){
+ inputDistance.value='',inputDuration.value=''
+  inputDistance.focus()
+  return alert('Must be positive numbers') }
+if(inputType.value==="running"){
+      this.runningFunction()
+    }else{
+  this.cyclingFunction()
+};
+
+   L.marker(this.#onClickCoordinates).addTo(this.#mapping)
+    .bindPopup(L.popup({
+ autoClose:false,
+closeOnClick:false,
+closeButton:false,
+className:`${v_type}-popup`
+    }
 )
+    
+    .setContent(`${inputType.value.slice(0,1).toUpperCase()}${inputType.value.slice(1)} on ${this._setDescription()} ${new Date().getDate()}`))
+    
+    .openPopup()
+   
+    form.classList.add('hidden')
+    inputDistance.value= inputDuration.value=''
+    
+    }
 
+////////////////////////////////
+// Generate form
+////////////////////////////
 
-///////////////////////////////////
-//////Foot navigation bar/////
+    _genForm(position){
+       this.#onClickCoordinates=position.latlng
+       
+      form.classList.remove('hidden')
+        inputDistance.focus()
+        inputDistance.value=''
+        document.querySelector('.form__input').value='running'
+    }
+
+    //////////////////////////
+    // Toggle to change between running and cycling on the form
+    ////////////////////////////////
+    menuToggle(){
+
+    cadence.closest('.form__row').classList.toggle('form__row--hidden')
+    elevGain.closest('.form__row').classList.toggle('form__row--hidden')
+    inputDistance.value='',inputDuration.value=''
+    inputDistance.focus()
+}
+//////////////////////////////
+// Public method
+//////////////////////////parentApp.
+// _setDescription(){
+//   let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+//   this._description=months[new Date().getMonth()]
+//   return (this._description)
+// }
+//////////////////////////////////////
+// function to fill in form for running excersize and generating as object
+/////////////////////////////////////
+runningFunction(){
+  v_distance=+inputDistance.value
+  v_duration=+inputDuration.value
+  v_type=inputType.value
+  
+workouts=new running(this.#onClickCoordinates,v_type,v_distance,v_duration,this.id)
+this.#allWorkouts.push(workouts)
+this.excersizeList(workouts.calcPace())
+console.log(this.#allWorkouts)
+}
+
+//////////////////////////////////////
+// function to fill in form for cycling excersize and generating as object
 /////////////////////////////////////
 
-// Footer navigation bar (all links direct to the top of the webpage)
+cyclingFunction(){
+  v_distance=+inputDistance.value
+  v_duration=+inputDuration.value
+  v_type=inputType.value
+workouts=new cycling(this.#onClickCoordinates,v_type,v_distance,v_duration,this.id)
+this.#allWorkouts.push(workouts)
+this.excersizeList(workouts.calcSpeed())
 
-const footer=document.querySelector('.footer__nav')
+console.log(this.#allWorkouts)
+}
 
-footer.addEventListener('click',function(e){
-  e.preventDefault()
+////////////////////////////////////
+// HTML code generated to insert excersize entry once position is clicked where excersize took place and form filled in
+///////////////////////////////////
+excersizeList(excersize){
 
-  if(!e.target.classList.contains('footer__link'))return
+   let Html=`<li class="workout workout--${v_type}" data-id=${workouts.id} >
+   <h2 class="workout__title">${v_type.slice(0,1).toUpperCase(0,1)}${v_type.slice(1)} on ${this._setDescription()} the ${new Date().getDate()}</h2>
+   <div class="workout__details">
+     <span class="workout__icon">${v_type==="running"?'🏃‍♂️':'🚴‍♀️'}</span>
+     <span class="workout__value">${v_distance}</span>
+     <span class="workout__unit">km</span>
+   </div>
+   <div class="workout__details">
+     <span class="workout__icon">⏱</span>
+     <span class="workout__value">${v_duration}</span>
+     <span class="workout__unit">min</span>
+   </div>
+   <div class="workout__details">
+     <span class="workout__icon">⚡️</span>
+     <span class="workout__value">${excersize}</span>
+     <span class="workout__unit">${v_type==='running'?'mtr/min':'km/hr'}</span>
+   </div>
+   `
 
-   const menu=e.target.getAttribute('href')
-  
-   document.querySelector(menu).scrollIntoView({behavior:'smooth'})
-  }
-)
-
-container.addEventListener('click',function(e){
-  e.preventDefault()
- 
-  // Choosing all link elements, then moving the active class from one link element to the other
-  const closestClick=e.target.closest('.operations__tab')
-  if(!closestClick)return
-  
-  tabs.forEach(tabLink=>{tabLink.classList.remove('operations__tab--active');
-closestClick.classList.add('operations__tab--active')
-  
-  // Choosing all information elements, then moving the active class from one element to the other
-  pageContents.forEach(informationFromTab=>informationFromTab
-  .classList.remove('operations__content--active'))
-  document.querySelector(`.operations__content--${closestClick.dataset.tab}`).classList.add('operations__content--active')
-
-  })
-  
-})
-
-
-// With the mouse over/mouse out you get to fade all other links in navigation bar except the target link including open account button and left side image
-const siblings = document.querySelectorAll('.highlight');
-const navBar = document.querySelector('.nav');
+   Html+=`
+   <div class="workout__details">
+     <span class="workout__icon">${v_type==='running'?'🦶🏼':'⛰'}</span>
+     <span class="workout__value">223</span>
+     <span class="workout__unit">${v_type==='running'?'fps':'mtr'}</span>
+   </div>
+   </li>`
+              
+form.insertAdjacentHTML('afterend',Html);
 
 
-const linksFadeFunction = function (e) {
-
-  if (e.target.closest('.nav__item')) {
-    const link = e.target;
-    
-    // To select all sibling links
-    const children = document.querySelector('.nav').querySelectorAll('.nav__link')
-    
-    children.forEach(el => {
-  if (el !== link ) {
-  el.style.opacity = this;
-  }
-
-  // Image opacity
-const image=document.querySelector('img')
-  if (image)
-  image.style.opacity = this;
-  });
-  }
-};
-
-// Mouse function events for top links
-navBar.addEventListener('mouseover', linksFadeFunction.bind(0.5));
-navBar.addEventListener('mouseout', linksFadeFunction.bind(1));
-
-////////////////////////////////////////////////
-//Testimonials
-///////////////////////////////////////
-
-// Using the left/right buttons you can slide the pictures, then using the dots at the bottom of the images you can choose which image you want to see
-
-const slides = document.querySelectorAll('.slide');
-const sliderContainer = document.querySelector('.slider');
-const lBtn = document.querySelector('.slider__btn--left');
-const rBtn = document.querySelector('.slider__btn--right');
-const maxSlide = slides.length - 1;
-const dots = document.querySelectorAll('.dots__dot');
-const dotContainer = document.querySelector('.dots');
-
-let letSlide=1
-init();
-
-function slideDot(e){
-  e.preventDefault()
-  const dotEvent=e.target.closest('.dots__dot')
-  
-  if(!dotEvent.classList.contains('dots__dot'))return
-
-dots.forEach(eachDot=>
+    }
    
-eachDot.classList.remove('dots__dot--active')
-)
-
-// Dots that are active
-dotEvent.classList.add('dots__dot--active')
-
-  letSlide=dotEvent.dataset.slide
-  imageSlider(letSlide)
-
-}
-
-dotContainer.addEventListener('click', slideDot.bind() )
-
-// To slide images left/right using buttons or dots
-function imageSlider(letSlide) {
-
-  slides.forEach(function (slide, i) {
+    ///////////////////////////////////////////////////
+    // moving of map to where excersize took place
+    ///////////////////////////////////////////////////
+    theClick(e){
+      const targetElement=e.target.closest('.workout')   
     
-    slide.style.transform = `translateX(${100 * (i+1-letSlide)}%)`;
-
-  });
-};
-
-// The left image button
-lBtn.addEventListener('click',  fnLBtn.bind(letSlide))
-
-  function fnLBtn(){
-   if(letSlide<=1)return
-    letSlide = +letSlide - 1;
-    
-    imageSlider(letSlide);
-    document
-    .querySelector(`.dots__dot[data-slide='${letSlide+1}']`).classList.remove('dots__dot--active')
-    document
-    .querySelector(`.dots__dot[data-slide='${letSlide}']`).classList.add('dots__dot--active')
+     let func= this.#allWorkouts.find(el=>el.id===targetElement.dataset.id)
+       
+         this.#mapping.setView(func.coords, zoomLevel,{
+        animate:true,
+        pan:{duration:1}})
+      
+    }
   }
 
-  // The right image button
-rBtn.addEventListener('click',  fnRBtn.bind(letSlide))
-
-  function fnRBtn(){
-  if(letSlide>=3)return
-letSlide = letSlide +1;
-imageSlider(letSlide);
-document
-.querySelector(`.dots__dot[data-slide='${letSlide-1}']`).classList.remove('dots__dot--active')
-document
-.querySelector(`.dots__dot[data-slide='${letSlide}']`).classList.add('dots__dot--active')
-  }
-
-function init() {
-  imageSlider(1);
-};
+  const App=new app()
 
 
-// The sticky navigation bar using intersection oberserver API
-
-const obsOptions = {
-  root: null,
-  threshold: 0,
-};
-
-const head = document.querySelector('.header__title');
-
-function stickyFunction(entries) {
-  const [entry] = entries
-
-  if (!entry.isIntersecting) {
-    document.querySelector('.nav').classList.add('sticky');
-};
-if (entry.isIntersecting) {
-  document.querySelector('.nav').classList.remove('sticky');
-}
-};
-
-const observer = new IntersectionObserver(stickyFunction, obsOptions);
-
-observer.observe(head);
-
-//The sections with intersection oberserver API
-const sectioned = document.querySelectorAll('.section');
-
-const fnSections = function (entries, observed) {
-  const [entry] = entries;
-
-  if (!entry.isIntersecting) return;
-  entry.target.classList.remove('section--hidden');
-  observed.unobserve(entry.target);
-};
-
-const objObserve = {
-  root: null,
-  threshold: 0.15,
-};
-
-const allSections = sectioned.forEach(function (sections) {
-  const observed = new IntersectionObserver(fnSections, objObserve);
-  observed.observe(sections);
-  sections.classList.add('section--hidden');
-});
-
-// Implementing lazy loading images
-const newImage=document.querySelectorAll('img[data-src]')
-
-const imgFn=function(entries){
-  const [entry]=entries
-  if(!entry.isIntersecting) return
-  entry.target.src=entry.target.dataset.src
-  entry.target.classList.remove('lazy-img')
-
-}
-
-const imgObject={
-  root:null,
-  rootMargin:'400px'
-  
-}
-
-// Replace the current (blurry) image with the real image
-const replaceImg=new IntersectionObserver(imgFn,imgObject)
-
-newImage.forEach(imgElement=>replaceImg.observe(imgElement))
-
-// Hides the images out of the image container
-sliderContainer.style.overflow = 'hidden';
