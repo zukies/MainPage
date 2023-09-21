@@ -7,7 +7,7 @@ document.querySelector('.message').textContent = '🎉 Correct Number!';
 document.querySelector('.number').textContent = 13;
 document.querySelector('.score').textContent = 10;
 
-document.querySelector('.guess').value = 23;
+
 console.log(document.querySelector('.guess').value);
 */
 
@@ -66,29 +66,19 @@ document.querySelector('.check').addEventListener('click', function () {
       document.querySelector('.score').textContent = 0;
     }
   }
-
-  /////////////////////////////////////////////////////////
-  // THE AGAIN BUTTON
+});
+  /////////////////////////////////////////////////////
+  // THE RESET BUTTON
   //////////////////////////////////
-  document.querySelector('.again').addEventListener('click', function () {
-    secretNumber = Math.trunc(Math.random() * 20) + 1;
-    score = 20;
-    document.querySelector('.score').textContent = score;
-    document.querySelector('.highscore').textContent = highscore;
-
-    document.querySelector('.number').textContent = secretNumber;
-    document.querySelector('.message').textContent = 'Start guessing...';
-    document.querySelector('body').style.backgroundColor = '#222';
-    document.querySelector('.guess').value = '';
-    if (score > highscore) {
-      // highscore = score;
-      console.log(highscore);
-      document.querySelector('.highscore').textContent = highscore;
-    }
+  document.querySelector('.reset').addEventListener('click', function () {
+  
+      document.querySelector('.guess').value = '';
+      document.querySelector('.guess').focus()
+    
   });
 
   
-});
+
 
 
 
