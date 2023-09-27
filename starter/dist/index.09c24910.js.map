@@ -1,0 +1,1 @@
+{"mappings":"AAAA,MAAM,OAAK;IACP,UAAS,CAAC;AACd;AAEA,KAAK,QAAQ,GAAC;IACV,UAAU;AACd;AAEA,QAAQ,GAAG,CAAC","sources":["src/js/script.js"],"sourcesContent":["const test={\r\n    greeting:{}\r\n}\r\n\r\ntest.greeting={\r\n    greeting: 'hello'\r\n}\r\n\r\nconsole.log(test)"],"names":[],"version":3,"file":"index.09c24910.js.map","sourceRoot":"/__parcel_source_root/"}
