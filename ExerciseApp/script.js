@@ -7,6 +7,7 @@
 const form=document.querySelector('.form'
 )
 const inputType=document.querySelector('.form__input')
+console.log(form)
 const cadence=document.querySelector('.form__input--cadence')
 const elevGain=document.querySelector('.form__input--elevation')
 const inputDistance=document.querySelector('.form__input--distance')
