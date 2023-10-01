@@ -77,6 +77,11 @@ document.querySelector('.check').addEventListener('click', function () {
     
   });
 
+  function init(){
+    document.querySelector('.guess').focus()
+  }
+  init()
+  
   
 
 
