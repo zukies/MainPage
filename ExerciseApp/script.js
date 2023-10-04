@@ -7,7 +7,6 @@
 const form=document.querySelector('.form'
 )
 const inputType=document.querySelector('.form__input')
-console.log(form)
 const cadence=document.querySelector('.form__input--cadence')
 const elevGain=document.querySelector('.form__input--elevation')
 const inputDistance=document.querySelector('.form__input--distance')
@@ -16,9 +15,9 @@ const workoutContainer=document.querySelector('.workouts')
 
 // App variable initiation
 let coords
-let v_distance
-let v_duration
-let v_type
+// let v_distance
+// let v_duration
+// let v_type
 let workouts
 let zoomLevel=13
 
@@ -29,28 +28,25 @@ let zoomLevel=13
 // Parent class
 ///////////////////////////
 class workout{
+
   id=(Date.now()+'').slice(5)
   
-      constructor(distance,duration){
+  constructor(distance,duration,coords,type){
+    this.type=type
     this.coords=coords
     this.distance=distance
     this.duration=duration
-    this._setDescription
     }
 }
 
 //////////////////////////////
 // children classes
 class running extends workout{
-constructor(coords,v_type,distance,duration,cadence){
+constructor(distance,duration,coords,type,cadence){
 
-super(distance,duration,coords)
-this.type=v_type
-this.coords=coords
-this.distance=distance
-this.duration=duration
+super(distance,duration,coords,type)
 
-this.inputCadence
+this.inputCadence=cadence
 this.calcPace()
 }
 calcPace(){
@@ -61,14 +57,11 @@ calcPace(){
 }
 
 class cycling extends workout{
-    constructor(coords,v_type,distance,duration,inputElevGain){
-    super(distance,duration,coords)
-  
-    this.type=v_type
-    this.coords=coords
-    this.distance=distance
-    this.duration=duration
-    this.inputElevGain
+    
+    constructor(coords,type,distance,duration,inputElevGain){
+    super(type,coords,distance,duration)
+
+    this.inputElevGain=inputElevGain
     this.calcSpeed()
     }
 
@@ -84,34 +77,26 @@ class cycling extends workout{
 ////////////////////////////
 // class creation for various variables for the form and map clicking
 ////////////////////////////
-class parentApp{
-  constructor()
-  {
-    this._setDescription()
-  }
+
+class app{
   _setDescription(){
     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    this._description=months[new Date().getMonth()]
-    return (this._description)
+    let date=months[new Date().getMonth()]
+  
+    return date
   }
-}
-class app extends parentApp{
-
-  #onClickCoords//mouse object which shows the coordinates inside
-  #onClickCoordinates//the click used to  generate a position on the map
     #mapping
     #allWorkouts=[]
   
 
     constructor(){
-      super(parentApp._setDescription)
+        
         this.findLocation()
         form.addEventListener('submit',this._genMarker.bind(this))
         inputType.addEventListener('change',this.menuToggle)
       
-        document.querySelector('.sidebar').addEventListener('click',this.theClick.bind(this))
-        // this._setDescription()
-        
+        document.querySelector('.sidebar').addEventListener('click',this.clickToPlace.bind(this))
+            
         
     }
 
@@ -154,7 +139,7 @@ this.#mapping.on('click',this._genForm.bind(this))
 
     _genMarker(e){
       
-  const arr=(...inputs)=>inputs.every(inp=>inp>0)
+   const arr=(...inputs)=>inputs.every(inp=>inp>0)
     e.preventDefault() 
     
       if (!arr(+inputDistance.value,+inputDuration.value)){
@@ -193,7 +178,7 @@ this.#mapping.on('click',this._genForm.bind(this))
 ////////////////////////////
 
     _genForm(position){
-       this.#onClickCoordinates=position.latlng
+       coords=position.latlng
              
       form.classList.remove('hidden')
        inputDistance.focus()
@@ -217,11 +202,12 @@ this.#mapping.on('click',this._genForm.bind(this))
 // function to fill in form for running exercise and generating as object
 /////////////////////////////////////
 runningFunction(){
-  v_distance=+inputDistance.value
-  v_duration=+inputDuration.value
-  v_type=inputType.value
+  let v_distance=+inputDistance.value
+  let v_duration=+inputDuration.value
+  let v_type=inputType.value
   
-workouts=new running(this.#onClickCoordinates,v_type,v_distance,v_duration,this.id)
+workouts=new running (v_distance,v_duration,coords,v_type,this .id)
+console.log (workouts)
 this.#allWorkouts.push(workouts)
 this._exerciseList(workouts)
 }
@@ -231,10 +217,10 @@ this._exerciseList(workouts)
 /////////////////////////////////////
 
 cyclingFunction(){
-  v_distance=+inputDistance.value
-  v_duration=+inputDuration.value
-  v_type=inputType.value
-workouts=new cycling(this.#onClickCoordinates,v_type,v_distance,v_duration,this.id)
+  let v_distance=+inputDistance.value
+  let v_duration=+inputDuration.value
+  let v_type=inputType.value
+workouts=new cycling(v_distance,v_duration,coords,v_type,this.id)
 this.#allWorkouts.push(workouts)
 this._exerciseList(workouts)
 
@@ -279,7 +265,7 @@ _exerciseList(workouts){
     ///////////////////////////////////////////////////
     // moving of map to where excersize took place
     ///////////////////////////////////////////////////
-    theClick(e){
+    clickToPlace(e){
     const targetElement=e.target.closest('.workout')   
     
      let fnWorkouts= this.#allWorkouts.find(el=>el.id===targetElement.dataset.id)
@@ -294,7 +280,7 @@ _exerciseList(workouts){
     }
   
     _getLocalStorage() {
-      const data = JSON.parse(localStorage.getItem('workouts'));
+     const data= JSON.parse(localStorage.getItem('workouts'))
   
       if (!data) return;
   
