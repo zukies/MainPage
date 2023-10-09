@@ -11,6 +11,10 @@ document.querySelector('.score').textContent = 10;
 console.log(document.querySelector('.guess').value);
 */
 
+//////////////////
+// DOM
+//////////////////
+
 let secretNumber = Math.trunc(Math.random() * 10) + 1;
 let score = 20;
 let highscore = 0;
@@ -26,12 +30,12 @@ document.querySelector('.check').addEventListener('click', function () {
 
   // When there is no input
   if (!guess) {
-    // document.querySelector('.message').textContent = '⛔️ No number!';
+    document.querySelector('.message').textContent = '⛔️ No number!';
     displayMessage('⛔️ No number!');
 
     // When player wins
   } else if (guess === secretNumber) {
-    // document.querySelector('.message').textContent = '🎉 Correct Number!';
+    document.querySelector('.message').textContent = '🎉 Correct Number!';
     displayMessage('🎉 Correct Number!');
     document.querySelector('.number').textContent = secretNumber;
 
